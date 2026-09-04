@@ -257,7 +257,7 @@ export default function QuizPage() {
               </div>
               <p className="text-foreground/70 text-sm">Kerja bagus! Periksa pembahasan jawaban di bawah ini.</p>
               
-              <div className="flex justify-center gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
                 <Button variant="primary" onClick={() => setStep('setup')}>
                   Buat Kuis Baru
                 </Button>

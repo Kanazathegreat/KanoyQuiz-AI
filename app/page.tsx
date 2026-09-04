@@ -21,21 +21,21 @@ export default function Home() {
       <div className="absolute top-10 left-10 w-72 h-72 bg-secondary/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <header className="w-full p-6 flex justify-between items-center max-w-7xl mx-auto z-10">
+      <header className="w-full p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto z-10 gap-4 sm:gap-0">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-md">
             <Brain className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-bold text-primary font-heading tracking-wide">QuizAI</h1>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
           {user ? (
             <>
               <span className="text-sm font-medium text-foreground">Halo, {fullName}</span>
               <Button
                 variant="secondary"
                 onClick={handleLogout}
-                className="px-5 py-2 text-sm"
+                className="px-4 py-2 text-sm"
               >
                 Logout
               </Button>
@@ -43,12 +43,12 @@ export default function Home() {
           ) : (
             <>
               <Link href="/login">
-                <Button variant="secondary" className="px-5 py-2 text-sm">
+                <Button variant="secondary" className="px-4 py-2 text-sm">
                   Login
                 </Button>
               </Link>
               <Link href="/register">
-                <Button variant="primary" className="px-6 py-2 text-sm">
+                <Button variant="primary" className="px-5 py-2 text-sm">
                   Register
                 </Button>
               </Link>

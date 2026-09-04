@@ -17,7 +17,8 @@ export default function Button({
   disabled = false,
   type = "button",
 }: ButtonProps) {
-  const baseClasses = "rounded-2xl font-medium transition-all duration-200";
+  const baseClasses = "rounded-2xl font-medium transition-all duration-200 px-6 py-3 flex items-center justify-center";
+// ... (rest of the component logic)
 
   const primaryClasses = `
     bg-primary text-white border-b-4 border-b-primary-dark 

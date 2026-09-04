@@ -197,16 +197,16 @@ setMaterial(data);
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <Button variant="primary" className="flex-1" onClick={() => setStep('setup')}>
-                Cari Materi Lain
-              </Button>
-              <Link href="/dashboard" className="flex-1">
-                <Button variant="secondary" className="w-full">
-                  Kembali ke Dashboard
+<div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button variant="primary" className="flex-1" onClick={() => setStep('setup')}>
+                  Cari Materi Lain
                 </Button>
-              </Link>
-            </div>
+                <Link href="/dashboard" className="flex-1">
+                  <Button variant="secondary" className="w-full">
+                    Kembali ke Dashboard
+                  </Button>
+                </Link>
+              </div>
           </div>
         )}
       </div>
