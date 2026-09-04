@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { Brain } from 'lucide-react';
+import { Brain, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Material {
@@ -24,6 +24,24 @@ export default function BelajarPage() {
   const [topic, setTopic] = useState('');
   const [material, setMaterial] = useState<Material | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isRateLimitError, setIsRateLimitError] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  const loadingMessages = [
+    'Menganalisis dan merangkum topik...',
+    'Menyusun poin-poin kunci utama...',
+    'Mencari kata kunci referensi terbantu...',
+    'Hampir selesai, sebentar lagi siap...'
+  ];
+
+  useEffect(() => {
+    if (step === 'loading') {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [step]);
 
   useEffect(() => {
     if (!user) {
@@ -35,10 +53,12 @@ export default function BelajarPage() {
     e.preventDefault();
     if (!topic.trim()) {
       setErrorMessage('Topik atau materi wajib diisi.');
+      setIsRateLimitError(false);
       return;
     }
 
     setErrorMessage(null);
+    setIsRateLimitError(false);
     setStep('loading');
 
     try {
@@ -51,23 +71,27 @@ export default function BelajarPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Terjadi kesalahan pada server.');
+        setErrorMessage(data.error || 'Terjadi kesalahan pada server.');
+        setIsRateLimitError(Boolean(data.isRateLimit));
+        setStep('setup');
+        return;
       }
 
-setMaterial(data);
-       // Save to Supabase history
-       if (user) {
-         supabase.from('material_history').insert({
-           user_id: user.id,
-           subject,
-           topic,
-         }).then(({ error }) => {
-           if (error) console.error('Error saving material history:', error);
-         });
-       }
-       setStep('result');
+      setMaterial(data);
+      // Save to Supabase history
+      if (user) {
+        supabase.from('material_history').insert({
+          user_id: user.id,
+          subject,
+          topic,
+        }).then(({ error }) => {
+          if (error) console.error('Error saving material history:', error);
+        });
+      }
+      setStep('result');
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal menghasilkan materi.');
+      setIsRateLimitError(false);
       setStep('setup');
     }
   };
@@ -87,8 +111,18 @@ setMaterial(data);
         </div>
 
         {errorMessage && step === 'setup' && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2xl text-sm mb-6 font-medium">
-            {errorMessage}
+          <div className={`${
+            isRateLimitError 
+              ? 'bg-amber-50 text-amber-700 border-amber-200' 
+              : 'bg-red-50 text-red-700 border-red-200'
+            } p-4 rounded-2xl text-sm mb-6 font-medium border flex items-center gap-3`}
+          >
+            {isRateLimitError ? (
+              <AlertCircle className="w-5 h-5 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+            )}
+            <span>{errorMessage}</span>
           </div>
         )}
 
@@ -139,7 +173,7 @@ setMaterial(data);
           <Card className="text-center space-y-4 py-12">
             <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <h3 className="text-xl font-bold text-foreground">AI sedang menyiapkan materi untukmu...</h3>
-            <p className="text-foreground/70 text-sm">Sedang merangkum poin-poin penting agar lebih mudah dipelajari.</p>
+            <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
           </Card>
         )}
 

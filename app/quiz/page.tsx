@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
-import { BookOpen, Brain } from 'lucide-react';
+import { BookOpen, Brain, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Question {
@@ -29,6 +29,24 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isRateLimitError, setIsRateLimitError] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  const loadingMessages = [
+    'Menyusun pertanyaan yang menarik...',
+    'Menyiapkan pilihan jawaban & opsi...',
+    'Memeriksa tingkat kesulitan materi...',
+    'Hampir selesai, sebentar lagi siap...'
+  ];
+
+  useEffect(() => {
+    if (step === 'loading') {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [step]);
 
   useEffect(() => {
     if (!user) {
@@ -40,10 +58,12 @@ export default function QuizPage() {
     e.preventDefault();
     if (!topic.trim()) {
       setErrorMessage('Topik atau materi wajib diisi.');
+      setIsRateLimitError(false);
       return;
     }
 
     setErrorMessage(null);
+    setIsRateLimitError(false);
     setStep('loading');
 
     try {
@@ -56,7 +76,10 @@ export default function QuizPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Terjadi kesalahan pada server.');
+        setErrorMessage(data.error || 'Terjadi kesalahan pada server.');
+        setIsRateLimitError(Boolean(data.isRateLimit));
+        setStep('setup');
+        return;
       }
 
       setQuestions(data.questions);
@@ -65,6 +88,7 @@ export default function QuizPage() {
       setStep('taking');
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal menghasilkan kuis.');
+      setIsRateLimitError(false);
       setStep('setup');
     }
   };
@@ -100,8 +124,18 @@ export default function QuizPage() {
         </div>
 
         {errorMessage && step === 'setup' && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2xl text-sm mb-6 font-medium">
-            {errorMessage}
+          <div className={`${
+            isRateLimitError 
+              ? 'bg-amber-50 text-amber-700 border-amber-200' 
+              : 'bg-red-50 text-red-700 border-red-200'
+            } p-4 rounded-2xl text-sm mb-6 font-medium border flex items-center gap-3`}
+          >
+            {isRateLimitError ? (
+              <AlertCircle className="w-5 h-5 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+            )}
+            <span>{errorMessage}</span>
           </div>
         )}
 
@@ -166,7 +200,7 @@ export default function QuizPage() {
           <Card className="text-center space-y-4 py-12">
             <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <h3 className="text-xl font-bold text-foreground">AI sedang membuat soal untukmu...</h3>
-            <p className="text-foreground/70 text-sm">Mohon tunggu sebentar sementara AI menyusun kuis terbaik.</p>
+            <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
           </Card>
         )}
 

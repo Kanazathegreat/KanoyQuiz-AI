@@ -45,8 +45,19 @@ Instruksi:
     try {
       result = await model.generateContent(prompt);
     } catch (err: any) {
+      console.error('Gemini API Call Error:', err);
+      const errMsg = err?.message || String(err);
+      const isRateLimit = /quota|rate limit|429|resource exhausted|too many requests/i.test(errMsg);
+
+      if (isRateLimit) {
+        return NextResponse.json(
+          { error: 'Sistem sedang banyak digunakan. Coba lagi dalam beberapa menit ya!', isRateLimit: true },
+          { status: 429 }
+        );
+      }
+
       return NextResponse.json(
-        { error: `Gagal memanggil model AI: ${err.message}` },
+        { error: `Gagal memanggil model AI: ${errMsg}` },
         { status: 500 }
       );
     }
@@ -61,6 +72,16 @@ Instruksi:
     return NextResponse.json(material);
   } catch (error: any) {
     console.error('Gemini API Error:', error);
+    const errMsg = error?.message || String(error);
+    const isRateLimit = /quota|rate limit|429|resource exhausted|too many requests/i.test(errMsg);
+
+    if (isRateLimit) {
+      return NextResponse.json(
+        { error: 'Sistem sedang banyak digunakan. Coba lagi dalam beberapa menit ya!', isRateLimit: true },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Gagal membuat materi belajar. Silakan coba lagi.' },
       { status: 500 }

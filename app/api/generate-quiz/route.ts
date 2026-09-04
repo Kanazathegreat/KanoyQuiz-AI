@@ -49,8 +49,18 @@ Berikan respons HANYA berupa array JSON yang valid tanpa markdown code block (ta
       result = await model.generateContent(prompt);
     } catch (err: any) {
       console.error('Gemini API Call Error:', err);
+      const errMsg = err?.message || String(err);
+      const isRateLimit = /quota|rate limit|429|resource exhausted|too many requests/i.test(errMsg);
+
+      if (isRateLimit) {
+        return NextResponse.json(
+          { error: 'Sistem sedang banyak digunakan. Coba lagi dalam beberapa menit ya!', isRateLimit: true },
+          { status: 429 }
+        );
+      }
+
       return NextResponse.json(
-        { error: `Gagal memanggil model AI: ${err.message}` },
+        { error: `Gagal memanggil model AI: ${errMsg}` },
         { status: 500 }
       );
     }
@@ -72,6 +82,16 @@ Berikan respons HANYA berupa array JSON yang valid tanpa markdown code block (ta
     return NextResponse.json({ questions });
   } catch (error: any) {
     console.error('Gemini API Error:', error);
+    const errMsg = error?.message || String(error);
+    const isRateLimit = /quota|rate limit|429|resource exhausted|too many requests/i.test(errMsg);
+
+    if (isRateLimit) {
+      return NextResponse.json(
+        { error: 'Sistem sedang banyak digunakan. Coba lagi dalam beberapa menit ya!', isRateLimit: true },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Gagal membuat kuis dengan AI. Silakan coba lagi.' },
       { status: 500 }
