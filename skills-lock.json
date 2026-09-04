@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "antislop": {
+      "source": "miqdadbadjuber/anti-slop",
+      "sourceType": "github",
+      "skillPath": "skills/antislop/SKILL.md",
+      "computedHash": "d1881eaefd63430542e25b3974e00edf81fdad1321e8cfcfe50b47e5d55b1dd7"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "dce739bef2928af5b36f892ad718faf1fdb0e4656a2acf6164fadce33bc22067"
+    }
+  }
+}

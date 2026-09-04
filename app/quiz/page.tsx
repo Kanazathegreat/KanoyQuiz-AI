@@ -1,0 +1,309 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Card from '@/components/Card';
+import Button from '@/components/Button';
+import { BookOpen, Brain } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Question {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export default function QuizPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const [step, setStep] = useState<'setup' | 'loading' | 'taking' | 'result'>('setup');
+  const [subject, setSubject] = useState('Matematika');
+  const [topic, setTopic] = useState('');
+  const [numQuestions, setNumQuestions] = useState(5);
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
+
+  const handleStartQuiz = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topic.trim()) {
+      setErrorMessage('Topik atau materi wajib diisi.');
+      return;
+    }
+
+    setErrorMessage(null);
+    setStep('loading');
+
+    try {
+      const res = await fetch('/api/generate-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, topic, numQuestions }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Terjadi kesalahan pada server.');
+      }
+
+      setQuestions(data.questions);
+      setSelectedAnswers(new Array(data.questions.length).fill(-1));
+      setCurrentIndex(0);
+      setStep('taking');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Gagal menghasilkan kuis.');
+      setStep('setup');
+    }
+  };
+
+  const handleSelectOption = (optionIndex: number) => {
+    const updated = [...selectedAnswers];
+    updated[currentIndex] = optionIndex;
+    setSelectedAnswers(updated);
+  };
+
+  const calculateScore = () => {
+    let score = 0;
+    questions.forEach((q, idx) => {
+      if (selectedAnswers[idx] === q.correctIndex) {
+        score++;
+      }
+    });
+    return score;
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="p-6 md:p-12">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <Link href="/dashboard" className="text-xl font-bold text-primary font-heading flex items-center gap-2">
+            <Brain className="w-6 h-6" /> QuizAI
+          </Link>
+          <Link href="/dashboard" className="text-sm font-bold text-foreground/60 hover:text-primary">
+            &larr; Kembali ke Dashboard
+          </Link>
+        </div>
+
+        {errorMessage && step === 'setup' && (
+          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-2xl text-sm mb-6 font-medium">
+            {errorMessage}
+          </div>
+        )}
+
+        {step === 'setup' && (
+          <Card>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Buat Kuis dengan AI</h2>
+            <form onSubmit={handleStartQuiz} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">Mata Pelajaran</label>
+                <select
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-border-warm rounded-2xl focus:outline-none focus:border-primary text-foreground bg-white"
+                >
+                  <option value="Matematika">Matematika</option>
+                  <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                  <option value="Bahasa Inggris">Bahasa Inggris</option>
+                  <option value="IPA">IPA</option>
+                  <option value="IPS">IPS</option>
+                  <option value="Fisika">Fisika</option>
+                  <option value="Kimia">Kimia</option>
+                  <option value="Biologi">Biologi</option>
+                  <option value="Sejarah">Sejarah</option>
+                  <option value="Ekonomi">Ekonomi</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">Materi atau Topik</label>
+                <input
+                  type="text"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  placeholder="Contoh: Pecahan, Simple Present Tense, Hukum Newton..."
+                  className="w-full px-4 py-3 border-2 border-border-warm rounded-2xl focus:outline-none focus:border-primary text-foreground placeholder:text-foreground/40 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-2">Jumlah Soal</label>
+                <select
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(Number(e.target.value))}
+                  className="w-full px-4 py-3 border-2 border-border-warm rounded-2xl focus:outline-none focus:border-primary text-foreground bg-white"
+                >
+                  <option value={5}>5 Soal</option>
+                  <option value={10}>10 Soal</option>
+                  <option value={15}>15 Soal</option>
+                  <option value={20}>20 Soal</option>
+                </select>
+              </div>
+
+              <Button type="submit" variant="primary" className="w-full py-4 text-lg">
+                Buat Kuis
+              </Button>
+            </form>
+          </Card>
+        )}
+
+        {step === 'loading' && (
+          <Card className="text-center space-y-4 py-12">
+            <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <h3 className="text-xl font-bold text-foreground">AI sedang membuat soal untukmu...</h3>
+            <p className="text-foreground/70 text-sm">Mohon tunggu sebentar sementara AI menyusun kuis terbaik.</p>
+          </Card>
+        )}
+
+        {step === 'taking' && questions.length > 0 && (
+          <Card className="space-y-6">
+            <div className="flex justify-between items-center text-sm font-semibold text-foreground/60">
+              <span>Soal {currentIndex + 1} dari {questions.length}</span>
+              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
+            </div>
+
+            <h3 className="text-xl font-bold text-foreground">
+              {questions[currentIndex].question}
+            </h3>
+
+            <div className="space-y-3">
+              {questions[currentIndex].options.map((option, oIdx) => {
+                const isSelected = selectedAnswers[currentIndex] === oIdx;
+                return (
+                  <button
+                    key={oIdx}
+                    onClick={() => handleSelectOption(oIdx)}
+                    className={`w-full text-left p-4 rounded-2xl border-2 transition flex items-center gap-3 font-medium ${
+                      isSelected
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border-warm hover:border-primary/50 text-foreground'
+                    }`}
+                  >
+                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold border-2 ${
+                      isSelected ? 'bg-primary text-white border-primary' : 'border-border-warm text-foreground/50'
+                    }`}>
+                      {String.fromCharCode(65 + oIdx)}
+                    </span>
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-between pt-4 border-t-2 border-border-warm">
+              <Button
+                variant="secondary"
+                disabled={currentIndex === 0}
+                onClick={() => setCurrentIndex(currentIndex - 1)}
+                className="px-6 py-2"
+              >
+                Sebelumnya
+              </Button>
+
+              {currentIndex < questions.length - 1 ? (
+                <Button variant="primary" onClick={() => setCurrentIndex(currentIndex + 1)} className="px-6 py-2">
+                  Selanjutnya
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={async () => {
+                    const score = calculateScore();
+                    if (user) {
+                      try {
+                        await supabase.from('quiz_history').insert({
+                          user_id: user.id,
+                          subject,
+                          topic,
+                          num_questions: questions.length,
+                          score,
+                        });
+                      } catch (err) {
+                        console.error('Failed to save quiz history:', err);
+                      }
+                    }
+                    setStep('result');
+                  }}
+                  className="px-6 py-2 bg-emerald-500 border-b-emerald-700 hover:bg-emerald-600"
+                >
+                  Selesai
+                </Button>
+              )}
+            </div>
+          </Card>
+        )}
+
+        {step === 'result' && (
+          <div className="space-y-6">
+            <Card className="text-center space-y-4">
+              <h3 className="text-2xl font-bold text-foreground">Hasil Kuis</h3>
+              <div className="text-4xl font-extrabold text-primary">
+                {calculateScore()} dari {questions.length} benar
+              </div>
+              <p className="text-foreground/70 text-sm">Kerja bagus! Periksa pembahasan jawaban di bawah ini.</p>
+              
+              <div className="flex justify-center gap-4 pt-4">
+                <Button variant="primary" onClick={() => setStep('setup')}>
+                  Buat Kuis Baru
+                </Button>
+                <Link href="/dashboard">
+                  <Button variant="secondary">Kembali ke Dashboard</Button>
+                </Link>
+              </div>
+            </Card>
+
+            <div className="space-y-4">
+              <h4 className="text-lg font-bold text-foreground">Review Pembahasan</h4>
+              {questions.map((q, qIdx) => {
+                const userAns = selectedAnswers[qIdx];
+                const isCorrect = userAns === q.correctIndex;
+                return (
+                  <Card key={qIdx} className="space-y-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <span className="font-semibold text-foreground">Soal {qIdx + 1}: {q.question}</span>
+                      <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                        isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {isCorrect ? 'Benar' : 'Salah'}
+                      </span>
+                    </div>
+
+                    <div className="text-sm space-y-1">
+                      <p className="text-foreground/80">
+                        <strong className="text-foreground">Jawabanmu:</strong> {userAns !== -1 ? q.options[userAns] : 'Tidak dijawab'}
+                      </p>
+                      {!isCorrect && (
+                        <p className="text-emerald-800">
+                          <strong className="text-emerald-900">Jawaban Benar:</strong> {q.options[q.correctIndex]}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="bg-background p-4 rounded-xl text-xs text-foreground/70 border border-border-warm">
+                      <strong>Penjelasan:</strong> {q.explanation}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
