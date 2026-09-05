@@ -73,12 +73,13 @@ export default function Home() {
           </motion.div>
         </div>
         
-        <motion.div 
-          variants={itemVariants}
-          animate={{ y: [0, -20, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Mascot className="w-64 h-64 md:w-80 md:h-80" />
+        <motion.div variants={itemVariants}>
+          <motion.div 
+            animate={{ y: [0, -20, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Mascot className="w-64 h-64 md:w-80 md:h-80" />
+          </motion.div>
         </motion.div>
       </motion.main>
 
