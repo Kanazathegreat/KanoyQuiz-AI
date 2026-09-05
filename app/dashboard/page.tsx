@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
+import Skeleton from '@/components/Skeleton';
 import { Brain, BookOpen, Sparkles, FileCheck, TrendingUp, Calendar, ArrowRight } from 'lucide-react';
 import { getUserStats, UserStats } from '@/lib/stats';
 import { motion } from 'framer-motion';
@@ -68,47 +69,85 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             <motion.div variants={itemVariants}>
               <Card className="flex items-center gap-3.5 p-4 bg-white/70">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <FileCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground/60">Kuis Dikerjakan</p>
-                  <h3 className="text-xl font-bold text-foreground">
-                    {loadingStats ? '...' : (stats?.quizCount ?? 0)}
-                  </h3>
-                </div>
+                {loadingStats ? (
+                  <>
+                    <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-6 w-10" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <FileCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground/60">Kuis Dikerjakan</p>
+                      <h3 className="text-xl font-bold text-foreground">
+                        {stats?.quizCount ?? 0}
+                      </h3>
+                    </div>
+                  </>
+                )}
               </Card>
             </motion.div>
+
             <motion.div variants={itemVariants}>
               <Card className="flex items-center gap-3.5 p-4 bg-white/70">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground/60">Materi Dipelajari</p>
-                  <h3 className="text-xl font-bold text-foreground">
-                    {loadingStats ? '...' : (stats?.materialCount ?? 0)}
-                  </h3>
-                </div>
+                {loadingStats ? (
+                  <>
+                    <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-6 w-10" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground/60">Materi Dipelajari</p>
+                      <h3 className="text-xl font-bold text-foreground">
+                        {stats?.materialCount ?? 0}
+                      </h3>
+                    </div>
+                  </>
+                )}
               </Card>
             </motion.div>
+
             <motion.div variants={itemVariants}>
               <Card className="flex items-center gap-3.5 p-4 bg-white/70">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground/60">Skor Rata-rata</p>
-                  <h3 className="text-xl font-bold text-foreground">
-                    {loadingStats ? '...' : (stats?.averageScorePercentage !== null ? `${stats?.averageScorePercentage}%` : '-')}
-                  </h3>
-                </div>
+                {loadingStats ? (
+                  <>
+                    <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-6 w-10" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground/60">Skor Rata-rata</p>
+                      <h3 className="text-xl font-bold text-foreground">
+                        {stats?.averageScorePercentage !== null ? `${stats?.averageScorePercentage}%` : '-'}
+                      </h3>
+                    </div>
+                  </>
+                )}
               </Card>
             </motion.div>
           </div>
         </motion.div>
 
-                {/* Main Action Cards (Primary / Prominent) */}
+        {/* Main Action Cards (Primary / Prominent) */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <div className="grid md:grid-cols-2 gap-6 pt-2 items-stretch">
             {/* Mulai Belajar Card */}
@@ -168,7 +207,23 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold text-foreground">Riwayat Terakhir</h2>
           <Card className="p-6">
             {loadingStats ? (
-              <p className="text-foreground/60 text-center py-4">Memuat riwayat...</p>
+              <div className="divide-y divide-border-warm">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-4 w-32 rounded-lg" />
+                      </div>
+                      <Skeleton className="h-3 w-20 rounded-md" />
+                    </div>
+                    <div className="space-y-1 text-right">
+                      <Skeleton className="h-5 w-8 ml-auto rounded-md" />
+                      <Skeleton className="h-3 w-6 ml-auto rounded-md" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : !stats?.recentQuizzes || stats.recentQuizzes.length === 0 ? (
               <div className="text-center py-6 space-y-2">
                 <p className="text-foreground/70 font-medium">Belum ada riwayat kuis. Yuk mulai belajar!</p>

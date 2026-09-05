@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { BookOpen, Brain, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
+import Skeleton from '@/components/Skeleton';
 import confetti from 'canvas-confetti';
 import { useRef } from 'react';
 
@@ -274,10 +275,31 @@ useEffect(() => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="text-center space-y-4 py-12">
-                <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <h3 className="text-xl font-bold text-foreground">AI sedang membuat soal untukmu...</h3>
-                <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
+              <Card className="space-y-6 p-8">
+                <div className="flex justify-between items-center border-b border-border-warm pb-4">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                
+                <div className="space-y-3 pt-2">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-3/4" />
+                </div>
+
+                <div className="space-y-3 pt-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="p-4 rounded-2xl border-2 border-border-warm/60 flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-xl shrink-0" />
+                      <Skeleton className="h-5 w-full" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center pt-6 border-t border-border-warm space-y-2">
+                  <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <h3 className="text-lg font-bold text-foreground">AI sedang membuat soal untukmu...</h3>
+                  <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
+                </div>
               </Card>
             </motion.div>
           )}

@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { Brain, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
+import Skeleton from '@/components/Skeleton';
 
 interface Material {
   explanation: string;
@@ -198,10 +199,27 @@ export default function BelajarPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="text-center space-y-4 py-12">
-                <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <h3 className="text-xl font-bold text-foreground">AI sedang menyiapkan materi untukmu...</h3>
-                <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
+              <Card className="space-y-6 p-8">
+                <Skeleton className="h-6 w-24 rounded-full" />
+                <Skeleton className="h-9 w-3/4" />
+                
+                <div className="space-y-3 pt-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                </div>
+
+                <div className="bg-secondary/10 p-6 rounded-2xl border-2 border-secondary/30 space-y-3">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+
+                <div className="text-center pt-6 border-t border-border-warm space-y-2">
+                  <div className="inline-block w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <h3 className="text-lg font-bold text-foreground">AI sedang menyiapkan materi untukmu...</h3>
+                  <p className="text-foreground/70 text-sm italic">{loadingMessages[loadingMessageIndex]}</p>
+                </div>
               </Card>
             </motion.div>
           )}
