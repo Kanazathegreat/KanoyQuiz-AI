@@ -7,6 +7,7 @@ import Card from '@/components/Card';
 import Header from '@/components/Header';
 import { Sparkles, BookOpen, Brain, ArrowRight, Zap, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Mascot from '@/components/Mascot';
 
 export default function Home() {
   const { user } = useAuth();
@@ -32,42 +33,52 @@ export default function Home() {
 
       {/* Hero Section */}
       <motion.main 
-        className="text-center space-y-8 max-w-3xl mx-auto z-10 pt-8 pb-16"
+        className="w-full max-w-6xl mx-auto z-10 pt-8 pb-16 flex flex-col md:flex-row items-center justify-center gap-12"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/30 text-foreground font-semibold text-sm mb-2 shadow-sm border border-secondary/40">
-          <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-          Platform Belajar & Kuis Generatif AI #1
-        </motion.div>
+        <div className="text-center md:text-left space-y-6 max-w-xl">
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/30 text-foreground font-semibold text-sm mb-2 shadow-sm border border-secondary/40">
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            Platform Belajar & Kuis Generatif AI #1
+          </motion.div>
 
-        <motion.h2 variants={itemVariants} className="text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight">
-          Belajar Lebih Cerdas <br /> Dengan <span className="text-primary">Bantuan AI</span>
-        </motion.h2>
+          <motion.h2 variants={itemVariants} className="text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight">
+            Belajar Lebih Cerdas <br /> Dengan <span className="text-primary">Bantuan AI</span>
+          </motion.h2>
 
-        <motion.p variants={itemVariants} className="text-xl text-foreground/70 max-w-2xl mx-auto font-medium">
-          Tingkatkan pemahaman Anda melalui kuis interaktif dan materi yang dipersonalisasi oleh kecerdasan buatan.
-        </motion.p>
+          <motion.p variants={itemVariants} className="text-xl text-foreground/70 font-medium">
+            Tingkatkan pemahaman Anda melalui kuis interaktif dan materi yang dipersonalisasi oleh kecerdasan buatan.
+          </motion.p>
 
-        <motion.div variants={itemVariants} className="pt-4 flex justify-center">
-          {user ? (
-            <Link href="/dashboard">
-              <Button variant="primary" className="px-8 py-4 text-lg flex items-center gap-3">
-                <BookOpen className="w-5 h-5" />
-                Buka Dashboard
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/register">
-              <Button variant="primary" className="px-8 py-4 text-lg flex items-center gap-3">
-                <Sparkles className="w-5 h-5" />
-                Mulai Belajar Sekarang
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
-          )}
+          <motion.div variants={itemVariants} className="pt-4 flex justify-center md:justify-start">
+            {user ? (
+              <Link href="/dashboard">
+                <Button variant="primary" className="px-8 py-4 text-lg flex items-center gap-3">
+                  <BookOpen className="w-5 h-5" />
+                  Buka Dashboard
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/register">
+                <Button variant="primary" className="px-8 py-4 text-lg flex items-center gap-3">
+                  <Sparkles className="w-5 h-5" />
+                  Mulai Belajar Sekarang
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
+            )}
+          </motion.div>
+        </div>
+        
+        <motion.div 
+          variants={itemVariants}
+          animate={{ y: [0, -20, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Mascot className="w-64 h-64 md:w-80 md:h-80" />
         </motion.div>
       </motion.main>
 
