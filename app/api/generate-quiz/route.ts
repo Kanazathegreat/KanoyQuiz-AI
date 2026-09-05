@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { subject, topic, numQuestions } = await request.json();
+    const { subject, topic, numQuestions, difficulty = 'Sedang' } = await request.json();
 
     if (!subject || !topic || !numQuestions) {
       return NextResponse.json(
@@ -65,13 +65,22 @@ export async function POST(request: Request) {
       generationConfig: { temperature: 0.9 }
     });
 
+    let difficultyInstruction = 'Tingkat kesimpulan/kesulitan yang sesuai untuk pembelajar umum.';
+    if (difficulty === 'Mudah') {
+      difficultyInstruction = 'Tingkat kesulitan: Mudah. Soal dasar, konsep fundamental, cocok untuk pemula yang baru belajar topik ini.';
+    } else if (difficulty === 'Sedang') {
+      difficultyInstruction = 'Tingkat kesulitan: Sedang. Soal dengan kompleksitas menengah, mengombinasikan beberapa konsep.';
+    } else if (difficulty === 'Sulit') {
+      difficultyInstruction = 'Tingkat kesulitan: Sulit. Soal analitis/aplikatif yang menguji pemahaman mendalam, bisa melibatkan studi kasus atau perhitungan lebih kompleks.';
+    }
+
     const sessionId = Math.random().toString(36).substring(7);
     const prompt = `Buatkan tepat ${numQuestions} soal kuis pilihan ganda dalam Bahasa Indonesia dengan topik "${topic}" untuk mata pelajaran "${subject}". 
+${difficultyInstruction}
 Sesi permintaan: ${sessionId}. 
 Instruksi khusus:
 1. Hasilkan soal yang unik dan bervariasi setiap kali diminta.
 2. Jelajahi aspek-aspek berbeda dari topik, hindari selalu menggunakan contoh buku teks yang paling umum.
-3. Tingkat kesulitan yang sesuai untuk pembelajar umum.
 Berikan respons HANYA berupa array JSON yang valid tanpa markdown code block (tanpa \`\`\`json ... \`\`\`), dengan skema struktur berikut:
 [
   {

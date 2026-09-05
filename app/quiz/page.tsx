@@ -29,6 +29,7 @@ export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [isRetryMode, setIsRetryMode] = useState(false);
+  const [difficulty, setDifficulty] = useState<'Mudah' | 'Sedang' | 'Sulit'>('Sedang');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isRateLimitError, setIsRateLimitError] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -77,7 +78,7 @@ export default function QuizPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session?.access_token}`
         },
-        body: JSON.stringify({ subject, topic, numQuestions }),
+        body: JSON.stringify({ subject, topic, numQuestions, difficulty }),
       });
 
       const data = await res.json();
@@ -194,6 +195,26 @@ export default function QuizPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-semibold text-foreground mb-3">Tingkat Kesulitan</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {(['Mudah', 'Sedang', 'Sulit'] as const).map((level) => (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => setDifficulty(level)}
+                      className={`py-3 px-4 rounded-2xl border-2 font-semibold transition ${
+                        difficulty === level 
+                          ? 'border-primary bg-primary text-white' 
+                          : 'border-border-warm bg-white text-foreground'
+                      }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
                 <label className="block text-sm font-semibold text-foreground mb-2">Jumlah Soal</label>
                 <select
                   value={numQuestions}
@@ -226,12 +247,15 @@ export default function QuizPage() {
           <Card className="space-y-6">
             <div className="flex justify-between items-center text-sm font-semibold text-foreground/60">
               <span>Soal {currentIndex + 1} dari {questions.length}</span>
-              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
-              {isRetryMode && (
-                <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded-full ml-2">
-                  Mode Ulangi Soal Salah
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
+                <span className="bg-secondary/30 text-foreground px-2.5 py-1 rounded-full text-xs font-bold">{difficulty}</span>
+                {isRetryMode && (
+                  <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
+                    Mode Ulangi
+                  </span>
+                )}
+              </div>
             </div>
 
             <h3 className="text-xl font-bold text-foreground">
@@ -289,6 +313,7 @@ export default function QuizPage() {
                           topic,
                           num_questions: questions.length,
                           score,
+                          difficulty,
                         });
                       } catch (err) {
                         console.error('Failed to save quiz history:', err);
