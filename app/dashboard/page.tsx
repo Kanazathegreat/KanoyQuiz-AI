@@ -51,15 +51,15 @@ export default function DashboardPage() {
     <div className="p-6 md:p-12">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Welcome Section */}
-        <div className="space-y-2">
+        <div className="space-y-3 pb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/30 text-foreground font-semibold text-xs border border-secondary/40">
             <Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
             Dashboard Belajar
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight font-heading">
             Selamat datang, {user.user_metadata?.full_name || 'User'}!
           </h1>
-          <p className="text-foreground/70 font-medium text-base md:text-lg">
+          <p className="text-foreground/60 font-normal text-lg md:text-xl leading-relaxed">
             Siap belajar sesuatu yang baru hari ini? Pilih aktivitas di bawah untuk mulai.
           </p>
         </div>

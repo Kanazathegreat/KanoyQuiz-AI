@@ -48,7 +48,7 @@ export default function Home() {
             Belajar Lebih Cerdas <br /> Dengan <span className="text-primary">Bantuan AI</span>
           </motion.h2>
 
-          <motion.p variants={itemVariants} className="text-xl text-foreground/70 font-medium">
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-foreground/70 font-normal leading-relaxed">
             Tingkatkan pemahaman Anda melalui kuis interaktif dan materi yang dipersonalisasi oleh kecerdasan buatan.
           </motion.p>
 
@@ -86,17 +86,17 @@ export default function Home() {
       {/* Features Section */}
       <motion.section 
         id="fitur" 
-        className="w-full max-w-6xl mx-auto z-10 py-16"
+        className="w-full max-w-6xl mx-auto z-10 py-24 md:py-32"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         variants={containerVariants}
       >
-        <div className="text-center space-y-3 mb-12">
-          <h3 className="text-3xl md:text-4xl font-extrabold text-foreground">
+        <div className="text-center space-y-4 mb-16">
+          <h3 className="text-4xl md:text-5xl font-extrabold text-foreground font-heading">
             Kenapa Belajar Bareng <span className="text-primary">QuizAI</span>?
           </h3>
-          <p className="text-foreground/70 font-medium text-lg max-w-xl mx-auto">
+          <p className="text-foreground/60 font-normal text-lg max-w-xl mx-auto leading-relaxed">
             Metode belajar modern yang dirancang untuk membantu Anda paham konsep lebih cepat dan menyenangkan.
           </p>
         </div>
