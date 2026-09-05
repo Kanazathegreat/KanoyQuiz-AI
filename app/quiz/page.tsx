@@ -9,6 +9,8 @@ import Button from '@/components/Button';
 import { BookOpen, Brain, AlertCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { useRef } from 'react';
 
 interface Question {
   question: string;
@@ -34,6 +36,7 @@ export default function QuizPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isRateLimitError, setIsRateLimitError] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const confettiFired = useRef(false);
 
   const loadingMessages = [
     'Menyusun pertanyaan yang menarik...',
@@ -51,11 +54,29 @@ export default function QuizPage() {
     }
   }, [step]);
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    }
-  }, [user, router]);
+useEffect(() => {
+     if (!user) {
+       router.push('/login');
+     }
+   }, [user, router]);
+
+   useEffect(() => {
+     if (step === 'result' && !confettiFired.current) {
+       const score = calculateScore();
+       const total = questions.length;
+       if (total > 0 && score / total >= 0.8) {
+         confettiFired.current = true;
+         confetti({
+           particleCount: 100,
+           spread: 70,
+           origin: { y: 0.6 },
+           colors: ['#FF9500', '#FFC107', '#FFFFFF']
+         });
+       }
+     } else if (step !== 'result') {
+       confettiFired.current = false;
+     }
+   }, [step]);
 
   const handleStartQuiz = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -366,10 +387,15 @@ export default function QuizPage() {
             >
               <div className="space-y-6">
                 <Card className="text-center space-y-4">
-                  <h3 className="text-2xl font-bold text-foreground">Hasil Kuis</h3>
-                  <div className="text-4xl font-extrabold text-primary">
-                    {calculateScore()} dari {questions.length} benar
-                  </div>
+<h3 className="text-2xl font-bold text-foreground">Hasil Kuis</h3>
+                   {calculateScore() / questions.length >= 0.8 ? (
+                     <p className="text-xl font-bold text-foreground">Luar biasa! 🎉</p>
+                   ) : (
+                     <p className="text-xl font-bold text-foreground">Terus berlatih, kamu pasti bisa lebih baik!</p>
+                   )}
+                   <div className="text-4xl font-extrabold text-primary">
+                     {calculateScore()} dari {questions.length} benar
+                   </div>
                   <p className="text-foreground/70 text-sm">Kerja bagus! Periksa pembahasan jawaban di bawah ini.</p>
                   
                   <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
