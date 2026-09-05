@@ -81,6 +81,7 @@ Sesi permintaan: ${sessionId}.
 Instruksi khusus:
 1. Hasilkan soal yang unik dan bervariasi setiap kali diminta.
 2. Jelajahi aspek-aspek berbeda dari topik, hindari selalu menggunakan contoh buku teks yang paling umum.
+3. DILARANG menggunakan notasi/sintaks LaTeX (seperti $, \\frac, \\times, dsb). Tuliskan semua ekspresi matematika menggunakan teks biasa yang natural dan mudah dibaca (misal: "2 1/2" atau "5/8" untuk pecahan, "3a^2" atau "3a pangkat 2" untuk eksponen, "x" atau "×" untuk perkalian).
 Berikan respons HANYA berupa array JSON yang valid tanpa markdown code block (tanpa \`\`\`json ... \`\`\`), dengan skema struktur berikut:
 [
   {
