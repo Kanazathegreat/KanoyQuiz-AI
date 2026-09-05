@@ -28,6 +28,7 @@ export default function QuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
+  const [isRetryMode, setIsRetryMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isRateLimitError, setIsRateLimitError] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -59,11 +60,13 @@ export default function QuizPage() {
     if (!topic.trim()) {
       setErrorMessage('Topik atau materi wajib diisi.');
       setIsRateLimitError(false);
+      setIsRetryMode(false);
       return;
     }
 
     setErrorMessage(null);
     setIsRateLimitError(false);
+    setIsRetryMode(false);
     setStep('loading');
 
     try {
@@ -93,6 +96,7 @@ export default function QuizPage() {
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal menghasilkan kuis.');
       setIsRateLimitError(false);
+      setIsRetryMode(false);
       setStep('setup');
     }
   };
@@ -111,6 +115,16 @@ export default function QuizPage() {
       }
     });
     return score;
+  };
+
+  const handleRetryWrong = () => {
+    const wrongQuestions = questions.filter((q, idx) => selectedAnswers[idx] !== q.correctIndex);
+    if (wrongQuestions.length === 0) return; // should not happen if button is hidden
+    setQuestions(wrongQuestions);
+    setSelectedAnswers(new Array(wrongQuestions.length).fill(-1));
+    setCurrentIndex(0);
+    setIsRetryMode(true);
+    setStep('taking');
   };
 
   if (!user) return null;
@@ -132,7 +146,7 @@ export default function QuizPage() {
             isRateLimitError 
               ? 'bg-amber-50 text-amber-700 border-amber-200' 
               : 'bg-red-50 text-red-700 border-red-200'
-            } p-4 rounded-2xl text-sm mb-6 font-medium border flex items-center gap-3`}
+          } p-4 rounded-2xl text-sm mb-6 font-medium border flex items-center gap-3`}
           >
             {isRateLimitError ? (
               <AlertCircle className="w-5 h-5 shrink-0" />
@@ -213,6 +227,11 @@ export default function QuizPage() {
             <div className="flex justify-between items-center text-sm font-semibold text-foreground/60">
               <span>Soal {currentIndex + 1} dari {questions.length}</span>
               <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
+              {isRetryMode && (
+                <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded-full ml-2">
+                  Mode Ulangi Soal Salah
+                </span>
+              )}
             </div>
 
             <h3 className="text-xl font-bold text-foreground">
@@ -262,7 +281,7 @@ export default function QuizPage() {
                   variant="primary"
                   onClick={async () => {
                     const score = calculateScore();
-                    if (user) {
+                    if (user && !isRetryMode) {
                       try {
                         await supabase.from('quiz_history').insert({
                           user_id: user.id,
@@ -296,9 +315,17 @@ export default function QuizPage() {
               <p className="text-foreground/70 text-sm">Kerja bagus! Periksa pembahasan jawaban di bawah ini.</p>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-                <Button variant="primary" onClick={() => setStep('setup')}>
+                <Button variant="primary" onClick={() => {
+                  setStep('setup');
+                  setIsRetryMode(false);
+                }}>
                   Buat Kuis Baru
                 </Button>
+                {calculateScore() < questions.length && (
+                  <Button variant="primary" onClick={handleRetryWrong} className="mt-2 sm:mt-0">
+                    Ulangi yang Salah Aja
+                  </Button>
+                )}
                 <Link href="/dashboard">
                   <Button variant="secondary">Kembali ke Dashboard</Button>
                 </Link>
