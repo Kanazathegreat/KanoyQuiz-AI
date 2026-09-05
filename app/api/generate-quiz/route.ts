@@ -1,11 +1,49 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from '@supabase/supabase-js';
 
 const apiKey = process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
 
+// Server-side Supabase client with Service Role or at least public keys
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
 export async function POST(request: Request) {
   try {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check rate limit
+    const { data: limitData } = await supabase
+      .from('api_rate_limit')
+      .select('last_generated_at')
+      .eq('user_id', user.id)
+      .single();
+
+    let diff = limitData?.last_generated_at ? Date.now() - new Date(limitData.last_generated_at).getTime() : null;
+    let blocked = diff !== null && diff < 10000;
+    console.log(`[QUIZ RATE LIMIT] user: ${user.id}, limitData:`, limitData, `diffMs: ${diff}, blocked: ${blocked}`);
+
+    if (blocked) {
+      return NextResponse.json(
+        { error: 'Tunggu sebentar sebelum generate lagi ya!', isRateLimit: true },
+        { status: 429 }
+      );
+    }
+
     const { subject, topic, numQuestions } = await request.json();
 
     if (!subject || !topic || !numQuestions) {
@@ -78,6 +116,12 @@ Berikan respons HANYA berupa array JSON yang valid tanpa markdown code block (ta
     if (!Array.isArray(questions) || questions.length === 0) {
       throw new Error('Format respons AI tidak valid.');
     }
+
+    // Update rate limit timestamp
+    await supabase.from('api_rate_limit').upsert({
+      user_id: user.id,
+      last_generated_at: new Date().toISOString(),
+    });
 
     return NextResponse.json({ questions });
   } catch (error: any) {
