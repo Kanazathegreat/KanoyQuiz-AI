@@ -29,9 +29,9 @@ export default function Header({ activeItem }: HeaderProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto z-50 sticky top-4 mb-8">
-      <header className="bg-white/90 backdrop-blur-md rounded-full px-5 sm:px-6 py-2.5 sm:py-3 shadow-lg border border-border-warm flex items-center justify-between gap-4">
+      <header className="bg-white/90 backdrop-blur-md rounded-full px-5 sm:px-6 py-2.5 sm:py-3 shadow-lg border border-border-warm grid grid-cols-2 md:grid-cols-3 items-center gap-4">
         {/* Logo Left */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 justify-self-start">
           <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white shadow-sm shrink-0">
             <Brain className="w-5 h-5" />
           </div>
@@ -39,7 +39,7 @@ export default function Header({ activeItem }: HeaderProps) {
         </Link>
 
         {/* Center Nav Items (Desktop) */}
-        <nav className="hidden md:flex items-center gap-1 bg-background/60 p-1 rounded-full border border-border-warm/60">
+        <nav className="hidden md:flex items-center justify-self-center gap-1 bg-background/60 p-1 rounded-full border border-border-warm/60">
           {navItems.map((item) => (
             <Link
               key={item.id}
@@ -56,7 +56,7 @@ export default function Header({ activeItem }: HeaderProps) {
         </nav>
 
         {/* Right Action & Mobile Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 justify-self-end">
           {user ? (
             <>
               <span className="hidden sm:inline text-xs sm:text-sm font-semibold text-foreground">Halo, {fullName}</span>

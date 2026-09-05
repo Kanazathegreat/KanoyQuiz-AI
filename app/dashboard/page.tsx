@@ -108,12 +108,12 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* Main Action Cards (Primary / Prominent) */}
+                {/* Main Action Cards (Primary / Prominent) */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          <div className="grid md:grid-cols-2 gap-6 pt-2">
+          <div className="grid md:grid-cols-2 gap-6 pt-2 items-stretch">
             {/* Mulai Belajar Card */}
-            <motion.div variants={itemVariants}>
-              <Card className="flex flex-col p-8 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/60 border-2 border-amber-200/60 shadow-md hover:shadow-lg transition">
+            <motion.div variants={itemVariants} className="h-full flex">
+              <Card className="flex flex-col h-full w-full p-8 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/60 border-2 border-amber-200/60 shadow-md hover:shadow-lg transition">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 shadow-inner shrink-0">
                     <BookOpen className="w-7 h-7" />
@@ -126,17 +126,19 @@ export default function DashboardPage() {
                 <p className="text-foreground/75 mb-6 flex-grow font-medium leading-relaxed">
                   Pelajari materi apa pun dengan penjelasan ringkas, poin penting, dan video referensi instan dari AI.
                 </p>
-                <Link href="/belajar">
-                  <Button variant="primary" className="w-full py-4 text-base font-bold flex items-center justify-center gap-2">
-                    Cari Materi Sekarang <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <div className="mt-auto">
+                  <Link href="/belajar">
+                    <Button variant="primary" className="w-full py-4 text-base font-bold flex items-center justify-center gap-2">
+                      Cari Materi Sekarang <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
               </Card>
             </motion.div>
 
             {/* Buat Kuis Card */}
-            <motion.div variants={itemVariants}>
-              <Card className="flex flex-col p-8 bg-gradient-to-br from-orange-50/80 via-white to-amber-50/60 border-2 border-orange-200/60 shadow-md hover:shadow-lg transition">
+            <motion.div variants={itemVariants} className="h-full flex">
+              <Card className="flex flex-col h-full w-full p-8 bg-gradient-to-br from-orange-50/80 via-white to-amber-50/60 border-2 border-orange-200/60 shadow-md hover:shadow-lg transition">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center text-primary shadow-inner shrink-0">
                     <Brain className="w-7 h-7" />
@@ -149,11 +151,13 @@ export default function DashboardPage() {
                 <p className="text-foreground/75 mb-6 flex-grow font-medium leading-relaxed">
                   Uji kemampuanmu lewat kuis interaktif yang dirancang khusus oleh AI lengkap dengan pembahasan detail.
                 </p>
-                <Link href="/quiz">
-                  <Button variant="primary" className="w-full py-4 text-base font-bold flex items-center justify-center gap-2">
-                    Mulai Latihan Kuis <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <div className="mt-auto">
+                  <Link href="/quiz">
+                    <Button variant="primary" className="w-full py-4 text-base font-bold flex items-center justify-center gap-2">
+                      Mulai Latihan Kuis <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
               </Card>
             </motion.div>
           </div>
