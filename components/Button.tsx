@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -18,7 +19,6 @@ export default function Button({
   type = "button",
 }: ButtonProps) {
   const baseClasses = "rounded-2xl font-medium transition-all duration-200 px-6 py-3 flex items-center justify-center";
-// ... (rest of the component logic)
 
   const primaryClasses = `
     bg-primary text-white border-b-4 border-b-primary-dark 
@@ -36,13 +36,14 @@ export default function Button({
   } ${className}`;
 
   return (
-    <button
+    <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      whileTap={{ scale: 0.97 }}
       className={classes}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }
