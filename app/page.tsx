@@ -1,14 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
-import { Sparkles, BookOpen, Brain, ArrowRight, Zap, Target } from 'lucide-react';
+import { Sparkles, BookOpen, Brain, ArrowRight, Zap, Target, Menu, X } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fullName = user?.user_metadata?.full_name || user?.email || 'User';
 
   const handleLogout = async () => {
@@ -16,49 +18,126 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-8 font-sans relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-8 font-sans relative overflow-hidden">
       {/* Decorative background blobs */}
       <div className="absolute top-10 left-10 w-72 h-72 bg-secondary/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <header className="w-full p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto z-10 gap-4 sm:gap-0">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-md">
-            <Brain className="w-6 h-6" />
+      {/* Floating Pill Header */}
+      <div className="w-full max-w-5xl mx-auto z-50 sticky top-4 mb-8">
+        <header className="bg-white/90 backdrop-blur-md rounded-full px-5 sm:px-6 py-2.5 sm:py-3 shadow-lg border border-border-warm flex items-center justify-between gap-4">
+          {/* Logo Left */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white shadow-sm shrink-0">
+              <Brain className="w-5 h-5" />
+            </div>
+            <span className="text-xl font-bold text-primary font-heading tracking-wide">QuizAI</span>
+          </Link>
+
+          {/* Center Nav Items (Desktop) */}
+          <nav className="hidden md:flex items-center gap-1 bg-background/60 p-1 rounded-full border border-border-warm/60">
+            <Link
+              href="/"
+              className="bg-primary/10 text-primary font-bold text-sm px-4 py-1.5 rounded-full transition"
+            >
+              Beranda
+            </Link>
+            <a
+              href="#fitur"
+              className="text-foreground/70 hover:text-primary font-semibold text-sm px-4 py-1.5 rounded-full transition"
+            >
+              Fitur
+            </a>
+            <Link
+              href="/docs"
+              className="text-foreground/70 hover:text-primary font-semibold text-sm px-4 py-1.5 rounded-full transition"
+            >
+              Docs
+            </Link>
+            <Link
+              href="/support"
+              className="text-foreground/70 hover:text-primary font-semibold text-sm px-4 py-1.5 rounded-full transition"
+            >
+              Support
+            </Link>
+          </nav>
+
+          {/* Right Action & Mobile Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {user ? (
+              <>
+                <span className="hidden sm:inline text-xs sm:text-sm font-semibold text-foreground">Halo, {fullName}</span>
+                <Button
+                  variant="secondary"
+                  onClick={handleLogout}
+                  className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="secondary" className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="primary" className="px-3.5 sm:px-5 py-1.5 text-xs sm:text-sm">
+                    Register
+                  </Button>
+                </Link>
+              </>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 rounded-full text-foreground hover:bg-black/5 transition"
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
-          <h1 className="text-2xl font-bold text-primary font-heading tracking-wide">QuizAI</h1>
-        </div>
-        <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
-          {user ? (
-            <>
-              <span className="text-sm font-medium text-foreground">Halo, {fullName}</span>
-              <Button
-                variant="secondary"
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm"
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button variant="secondary" className="px-4 py-2 text-sm">
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button variant="primary" className="px-5 py-2 text-sm">
-                  Register
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
-      </header>
-      
+        </header>
+
+        {/* Mobile Dropdown Panel */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-3xl p-4 shadow-xl border border-border-warm flex flex-col gap-2 z-50">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="bg-primary/10 text-primary font-bold text-sm px-4 py-2.5 rounded-2xl"
+            >
+              Beranda
+            </Link>
+            <a
+              href="#fitur"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-foreground/80 hover:text-primary font-semibold text-sm px-4 py-2.5 rounded-2xl"
+            >
+              Fitur
+            </a>
+            <Link
+              href="/docs"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-foreground/80 hover:text-primary font-semibold text-sm px-4 py-2.5 rounded-2xl"
+            >
+              Docs
+            </Link>
+            <Link
+              href="/support"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-foreground/80 hover:text-primary font-semibold text-sm px-4 py-2.5 rounded-2xl"
+            >
+              Support
+            </Link>
+          </div>
+        )}
+      </div>
+
       {/* Hero Section */}
-      <main className="text-center space-y-8 max-w-3xl mx-auto z-10 pt-12 pb-16">
+      <main className="text-center space-y-8 max-w-3xl mx-auto z-10 pt-8 pb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/30 text-foreground font-semibold text-sm mb-2 shadow-sm border border-secondary/40">
           <Sparkles className="w-4 h-4 text-primary animate-pulse" />
           Platform Belajar & Kuis Generatif AI #1
@@ -94,7 +173,7 @@ export default function Home() {
       </main>
 
       {/* Features Section */}
-      <section className="w-full max-w-6xl mx-auto z-10 py-16">
+      <section id="fitur" className="w-full max-w-6xl mx-auto z-10 py-16">
         <div className="text-center space-y-3 mb-12">
           <h3 className="text-3xl md:text-4xl font-extrabold text-foreground">
             Kenapa Belajar Bareng <span className="text-primary">QuizAI</span>?
