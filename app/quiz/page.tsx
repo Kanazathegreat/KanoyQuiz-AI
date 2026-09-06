@@ -290,23 +290,35 @@ useEffect(() => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-             <Card className="space-y-6">
-               <div className="flex justify-between items-center text-sm font-semibold text-foreground/60">
-                 <span>Soal {currentIndex + 1} dari {questions.length}</span>
-                 <div className="flex items-center gap-2">
-                   <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
-                   <span className="bg-secondary/30 text-foreground px-2.5 py-1 rounded-full text-xs font-bold">{difficulty}</span>
-                   {isRetryMode && (
-                     <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
-                       Mode Ulangi
-                     </span>
-                   )}
-                 </div>
-               </div>
+              <Card className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm font-semibold text-foreground/60">
+                    <span>Soal {currentIndex + 1} dari {questions.length}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full">{subject}</span>
+                      <span className="bg-secondary/30 text-foreground px-2.5 py-1 rounded-full text-xs font-bold">{difficulty}</span>
+                      {isRetryMode && (
+                        <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
+                          Mode Ulangi
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-               <h3 className="text-xl font-bold text-foreground">
-                 {questions[currentIndex].question}
-               </h3>
+                  {/* Horizontal Visual Progress Bar */}
+                  <div className="w-full bg-border-warm h-2.5 rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${isRetryMode ? 'bg-amber-500' : 'bg-primary'}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                    />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-foreground">
+                  {questions[currentIndex].question}
+                </h3>
 
                <div className="space-y-3">
                  {questions[currentIndex].options.map((option, oIdx) => {
