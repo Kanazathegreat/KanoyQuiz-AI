@@ -10,6 +10,7 @@ import Skeleton from '@/components/Skeleton';
 import { Brain, BookOpen, Sparkles, FileCheck, TrendingUp, Calendar, ArrowRight } from 'lucide-react';
 import { getUserStats, UserStats } from '@/lib/stats';
 import { motion } from 'framer-motion';
+import Mascot from '@/components/Mascot';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -224,13 +225,21 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
+
+
             ) : !stats?.recentQuizzes || stats.recentQuizzes.length === 0 ? (
-              <div className="text-center py-6 space-y-2">
-                <p className="text-foreground/70 font-medium">Belum ada riwayat kuis. Yuk mulai belajar!</p>
+              <div className="text-center py-10 space-y-4 flex flex-col items-center">
+                <Mascot className="w-24 h-24" />
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold text-foreground">Belum ada riwayat nih!</h3>
+                  <p className="text-foreground/60 font-medium text-sm">
+                    Yuk mulai kuis pertamamu dan lihat progresmu di sini.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="divide-y divide-border-warm">
-                {stats.recentQuizzes.map((quiz) => (
+                {stats?.recentQuizzes.map((quiz) => (
                   <div key={quiz.id} className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
